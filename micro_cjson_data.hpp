@@ -248,28 +248,28 @@ inline bool *JSONData_readBool(JSONData *data)
 	if(data->type == VDT_BOOL)
 		return (bool *) data->pointer;
 	else
-		return NULL;
+		return nullptr;
 }
 inline int *JSONData_readInt(JSONData *data)
 {
-	if(data->type == VDT_INT)
+	if(data->type == VDT_INT || data->type == VDT_ULONG)
 		return (int *) data->pointer;
 	else
-		return NULL;
+		return nullptr;
 }
 inline unsigned long *JSONData_readULong(JSONData *data)
 {
-	if(data->type == VDT_ULONG)
+	if(data->type == VDT_INT || data->type == VDT_ULONG)
 		return (unsigned long *) data->pointer;
 	else
-		return NULL;
+		return nullptr;
 }
 inline string *JSONData_readString(JSONData *data)
 {
 	if(data->type == VDT_STRING)
 		return (string *) data->pointer;
 	else
-		return NULL;
+		return nullptr;
 }
 
 inline void JSONData_delete(JSONData *data)
