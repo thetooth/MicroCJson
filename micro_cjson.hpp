@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdlib>
 #include <vector>
 #include "micro_cjson_data.hpp"
@@ -11,23 +13,23 @@ typedef enum {
 } JsonParserContainer;
 
 
-bool checknum(char s)
+inline bool checknum(char s)
 {
 	return (s >= 48 && s <= 57);
 }
 
 
-extern "C" JSONData *parseJSON(string data)
+extern "C" inline JSONData *parseJSON(string data)
 {
 	const char *dc = data.c_str();
-	
+
 	int p = -1;
 	JsonParserState state = UNKNOW;
 	string key = "";
 	vector<string> key_level;
 	vector<JSONData*> stack;
 	vector<JsonParserContainer> stack_type;
-	
+
 	for(int i=0; dc[i] != '\0'; i++){
 		if(dc[i] == '{'){
 			state = UNKNOW;
@@ -61,7 +63,7 @@ extern "C" JSONData *parseJSON(string data)
 				JSONData_listAdd(stack[stack.size() - 2], stack[stack.size() - 1]);
 			else if(stack_type[stack_type.size() - 2] == MAP)
 				JSONData_mapAdd(stack[stack.size() - 2], key_level[key_level.size() - 1], stack[stack.size() - 1]);
-			
+
 			stack.pop_back();
 			stack_type.pop_back();
 			key_level.pop_back();
@@ -78,17 +80,17 @@ extern "C" JSONData *parseJSON(string data)
 
 			if(dc[i] == '"'){
 				string value = "";
-				
+
 				i++;
 				while(dc[i] != '"'){
 					if(dc[i] == '\\' && dc[i+1] != 'u'){
 						i++;
 					}
-		
+
 					value += dc[i];
 					i++;
 				}
-				
+
 				if(stack_type[stack_type.size() - 1] == MAP)
 					JSONData_mapAdd(stack[stack.size() - 1], key, JSONData_createByString(value));
 				else
@@ -96,7 +98,7 @@ extern "C" JSONData *parseJSON(string data)
 			}
 			else if(dc[i] == 'f'){
 				i += 4;
-				
+
 				if(stack_type[stack_type.size() - 1] == MAP)
 					JSONData_mapAdd(stack[stack.size() - 1], key, JSONData_createByBool(false));
 				else
@@ -104,7 +106,7 @@ extern "C" JSONData *parseJSON(string data)
 			}
 			else if(dc[i] == 't'){
 				i += 3;
-				
+
 				if(stack_type[stack_type.size() - 1] == MAP)
 					JSONData_mapAdd(stack[stack.size() - 1], key, JSONData_createByBool(true));
 				else
@@ -112,7 +114,7 @@ extern "C" JSONData *parseJSON(string data)
 			}
 			else if(dc[i] == 'n'){
 				i += 3;
-				
+
 				if(stack_type[stack_type.size() - 1] == MAP)
 					JSONData_mapAdd(stack[stack.size() - 1], key, JSONData_createNull());
 				else
@@ -125,7 +127,7 @@ extern "C" JSONData *parseJSON(string data)
 					value += dc[i];
 					i++;
 				}
-				
+
 				if(stack_type[stack_type.size() - 1] == MAP)
 					JSONData_mapAdd(stack[stack.size() - 1], key, JSONData_createByULong( atoi(value.c_str()) ));
 				else
