@@ -70,7 +70,7 @@ extern "C" inline JSONData *parseJSON(string data)
 			p--;
 		}
 
-		else if(state == IN_KEY || (stack_type[stack_type.size() - 1] == LIST)){
+		else if(state == IN_KEY || (stack_type[stack_type.size() - 1] == MAP) || (stack_type[stack_type.size() - 1] == LIST)){
 			state = IN_VALUE;
 
 			if(dc[i] == ':'){
