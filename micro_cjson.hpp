@@ -40,6 +40,14 @@ typedef enum {
 	VDT_NULL, VDT_BOOL, VDT_INT, VDT_ULONG, VDT_STRING, VDT_LIST, VDT_MAP
 } JSONDataType;
 
+typedef enum {
+	UNKNOWN, IN_KEY, IN_VALUE
+} JsonParserState;
+
+typedef enum {
+	MAP, LIST
+} JsonParserContainer;
+
 typedef struct JSONData_t {
 	void *pointer;
 	JSONDataType type;
@@ -66,6 +74,7 @@ void JSONData_listDump(JSONData* d_list, int i);
 inline JSONData *vdgi(JSONData *p, int k){
 	return ((* ((JSONData *) p))[k]);
 }
+
 inline JSONData *vdgc(JSONData *p, const char *k){
 	return ((* ((JSONData *) p))[k]);
 }
@@ -109,6 +118,7 @@ inline JSONData *JSONData_mapCreate()
 
 	return vd;
 }
+
 inline bool JSONData_mapAdd(JSONData* d_map, string key, JSONData *value)
 {
 	if(d_map->type != VDT_MAP)
@@ -117,6 +127,7 @@ inline bool JSONData_mapAdd(JSONData* d_map, string key, JSONData *value)
 	((map<string, JSONData*> *) d_map->pointer)->insert( pair<string,JSONData*>(key, value) );
 	return true;
 }
+
 inline JSONData *JSONData_mapGet(JSONData* d_map, string key)
 {
 	if(d_map->type != VDT_MAP)
@@ -129,6 +140,7 @@ inline JSONData *JSONData_mapGet(JSONData* d_map, string key)
 		return tmp->second;
 	}
 }
+
 inline void JSONData_mapDump(JSONData* d_map, int i)
 {	
 	map<string, JSONData*> *p_map = (map<string, JSONData*> *) d_map->pointer;
@@ -171,7 +183,6 @@ inline void JSONData_mapDump(JSONData* d_map, int i)
 	cout << "}" << endl;
 }
 
-
 inline JSONData *JSONData_listCreate()
 {
 	JSONData *vd = new JSONData;
@@ -181,6 +192,7 @@ inline JSONData *JSONData_listCreate()
 
 	return vd;
 }
+
 inline bool JSONData_listAdd(JSONData* d_map, JSONData *value)
 {
 	if(d_map->type != VDT_LIST)
@@ -189,6 +201,7 @@ inline bool JSONData_listAdd(JSONData* d_map, JSONData *value)
 	((vector<JSONData*> *) d_map->pointer)->push_back( value );
 	return true;
 }
+
 inline void JSONData_listDump(JSONData* d_list, int i)
 {
 	vector<JSONData*> *p_list = (vector<JSONData*> *) d_list->pointer;
@@ -239,6 +252,7 @@ inline JSONData *JSONData_createNull()
 
 	return vd;
 }
+
 inline JSONData *JSONData_createByBool(bool d)
 {
 	JSONData *vd = new JSONData;
@@ -248,6 +262,7 @@ inline JSONData *JSONData_createByBool(bool d)
 
 	return vd;
 }
+
 inline JSONData *JSONData_createByInt(int d)
 {
 	JSONData *vd = new JSONData;
@@ -257,6 +272,7 @@ inline JSONData *JSONData_createByInt(int d)
 
 	return vd;
 }
+
 inline JSONData *JSONData_createByULong(unsigned long d)
 {
 	JSONData *vd = new JSONData;
@@ -266,6 +282,7 @@ inline JSONData *JSONData_createByULong(unsigned long d)
 
 	return vd;
 }
+
 inline JSONData *JSONData_createByString(string d)
 {
 	JSONData *vd = new JSONData;
@@ -283,6 +300,7 @@ inline bool *JSONData_readBool(JSONData *data)
 	else
 		return nullptr;
 }
+
 inline int *JSONData_readInt(JSONData *data)
 {
 	if(data != nullptr && (data->type == VDT_INT || data->type == VDT_ULONG))
@@ -290,6 +308,7 @@ inline int *JSONData_readInt(JSONData *data)
 	else
 		return nullptr;
 }
+
 inline unsigned long *JSONData_readULong(JSONData *data)
 {
 	if(data != nullptr && (data->type == VDT_INT || data->type == VDT_ULONG))
@@ -297,6 +316,7 @@ inline unsigned long *JSONData_readULong(JSONData *data)
 	else
 		return nullptr;
 }
+
 inline string *JSONData_readString(JSONData *data)
 {
 	if(data != nullptr && data->type == VDT_STRING)
@@ -315,7 +335,6 @@ inline void JSONData_delete(JSONData *data)
 	delete data;
 }
 
-
 inline void JSONData_dump(JSONData *data)
 {
 	if(data == nullptr){
@@ -327,27 +346,17 @@ inline void JSONData_dump(JSONData *data)
 	}
 }
 
-typedef enum {
-	UNKNOW, IN_KEY, IN_VALUE
-} JsonParserState;
-
-typedef enum {
-	MAP, LIST
-} JsonParserContainer;
-
-
 inline bool checknum(char s)
 {
 	return (s >= 48 && s <= 57);
 }
-
 
 extern "C" inline JSONData *parseJSON(string data)
 {
 	const char *dc = data.c_str();
 
 	int p = -1;
-	JsonParserState state = UNKNOW;
+	JsonParserState state = UNKNOWN;
 	string key = "";
 	vector<string> key_level;
 	vector<JSONData*> stack;
@@ -355,21 +364,21 @@ extern "C" inline JSONData *parseJSON(string data)
 
 	for(int i=0; dc[i] != '\0'; i++){
 		if(dc[i] == '{'){
-			state = UNKNOW;
+			state = UNKNOWN;
 			key_level.push_back(key);
 			stack.push_back(JSONData_mapCreate());
 			stack_type.push_back(MAP);
 			p++;
 		}
 		else if(dc[i] == '['){
-			state == UNKNOW;
+			state == UNKNOWN;
 			key_level.push_back(key);
 			stack.push_back(JSONData_listCreate());
 			stack_type.push_back(LIST);
 			p++;
 		}
 
-		else if((dc[i] == '"' && (state == IN_VALUE || state == UNKNOW)) && stack_type[stack_type.size() - 1] == MAP){
+		else if((dc[i] == '"' && (state == IN_VALUE || state == UNKNOWN)) && stack_type[stack_type.size() - 1] == MAP){
 			key = "";
 
 			state = IN_KEY;
