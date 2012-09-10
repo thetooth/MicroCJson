@@ -94,7 +94,12 @@ inline JSONData *JSONData_mapGet(JSONData* d_map, string key)
 	if(d_map->type != VDT_MAP)
 		return false;
 
-	return ((map<string, JSONData*> *) d_map->pointer)->find(key)->second;
+	auto tmp = ((map<string, JSONData*> *) d_map->pointer)->find(key);
+	if (tmp == ((map<string, JSONData*> *) d_map->pointer)->end()){
+		return nullptr;
+	}else{
+		return tmp->second;
+	}
 }
 inline void JSONData_mapDump(JSONData* d_map, int i)
 {	
@@ -245,28 +250,28 @@ inline JSONData *JSONData_createByString(string d)
 
 inline bool *JSONData_readBool(JSONData *data)
 {
-	if(data->type == VDT_BOOL)
+	if(data != nullptr && data->type == VDT_BOOL)
 		return (bool *) data->pointer;
 	else
 		return nullptr;
 }
 inline int *JSONData_readInt(JSONData *data)
 {
-	if(data->type == VDT_INT || data->type == VDT_ULONG)
+	if(data != nullptr && (data->type == VDT_INT || data->type == VDT_ULONG))
 		return (int *) data->pointer;
 	else
 		return nullptr;
 }
 inline unsigned long *JSONData_readULong(JSONData *data)
 {
-	if(data->type == VDT_INT || data->type == VDT_ULONG)
+	if(data != nullptr && (data->type == VDT_INT || data->type == VDT_ULONG))
 		return (unsigned long *) data->pointer;
 	else
 		return nullptr;
 }
 inline string *JSONData_readString(JSONData *data)
 {
-	if(data->type == VDT_STRING)
+	if(data != nullptr && data->type == VDT_STRING)
 		return (string *) data->pointer;
 	else
 		return nullptr;
@@ -285,9 +290,11 @@ inline void JSONData_delete(JSONData *data)
 
 inline void JSONData_dump(JSONData *data)
 {
-	if(data->type == VDT_MAP){
+	if(data == nullptr){
+		cout << "!nullptr" << endl;
+	}else if(data->type == VDT_MAP){
 		JSONData_mapDump(data, 0);
-	}else if(data->type == VDT_LIST)
+	}else if(data->type == VDT_LIST){
 		JSONData_listDump(data, 0);
-
+	}
 }
