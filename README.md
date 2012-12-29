@@ -1,21 +1,21 @@
 MicroCJson
 ==========
 
-A C++11 Json parser and stack machine
+A C++11 Json parser and stack machine.
 
-Using
+Usage
 -----
 
 * Include micro_cjson.hpp
-* Call parseJSON(string) with the JSON data in a string container
-* The return type is JSONData
-* Use the functions JSONData_read<type>(JSONData) to read
+* Call parseJSON(string) with your json syntax
+* The return type is JSONData, open maps with JSONData_mapGet(JSONData, string), lists with JSONData_listGet, etc
+* Use the functions JSONData_read{type}(JSONData) to read data types
 
 License
 -------
 
-    Copyright (c) 2012 Ameoto Systems Inc. All rights reserved.
-    Original code by cristianob
+    Copyright (c) 2012-2013 Ameoto Systems Inc. All rights reserved.
+    Copyright (c) 2011 cristianob. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met: 
